@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0">
+
+  <title>Enumerator Payment Balance System</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+  <h1>Enumerator Payment Balance System</h1>
+  <p>Survey Payment Pending Balance Cash Report</p>
+</header>
+
+<div class="container">
+
+  <!-- Navigation -->
+  <div class="tabs">
+
+    <button
+      class="tab-btn active"
+      onclick="showPage('dashboard', this)">
+      Dashboard
+    </button>
+
+    <button
+      class="tab-btn"
+      onclick="showPage('enumerators', this)">
+      Enumerators
+    </button>
+
+    <button
+      class="tab-btn"
+      onclick="showPage('surveys', this)">
+      Add Surveys
+    </button>
+
+    <button
+  class="tab-btn"
+  onclick="showPage('ddpoFunds', this)">
+  Fund Received from DDPO
+</button>
+
+    <button
+      class="tab-btn"
+      onclick="showPage('payments', this)">
+      Add Payment
+    </button>
+
+    <button
+      class="tab-btn"
+      onclick="showPage('reports', this)">
+      Reports
+    </button>
+
+  </div>
+
+  <!-- Dashboard -->
+  <section
+    id="dashboard"
+    class="page active">
+
+    <div class="cards">
+
+      <div class="card">
+        <h3>Total Enumerators</h3>
+        <div
+          id="totalEnumerators"
+          class="amount">
+          0
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Total Surveys</h3>
+        <div
+          id="totalSurveys"
+          class="amount">
+          0
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Total Earned</h3>
+        <div
+          id="totalEarned"
+          class="amount">
+          ₹0
+        </div>
+      </div>
+
+      <div class="card">
+  <h3>Total DDPO Released</h3>
+
+  <div
+    id="dashboardTotalDDPOReleased"
+    class="amount">
+    ₹0
+  </div>
+</div>
+
+      <div class="card">
+        <h3>Total Paid to Enumerators</h3>
+        <div
+          id="totalPaid"
+          class="amount">
+          ₹0
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Total Pending from Earned</h3>
+        <div
+          id="totalPending"
+          class="amount">
+          ₹0
+        </div>
+      </div>
+
+      <div class="card">
+  <h3>Pending from DDPO Fund Released</h3>
+
+  <div
+    id="dashboardPendingDDPO"
+    class="amount">
+    ₹0
+  </div>
+</div>
+      
+      <div class="card inactive-pending-card">
+  <h3>Inactive Enumerators Pending</h3>
+  <div
+    id="inactivePendingAmount"
+    class="amount">
+    ₹0
+  </div>
+</div>
+
+    </div>
+
+    <div class="panel">
+      <h2>
+        Inactive Enumerators With Pending Payment
+      </h2>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Total Surveys</th>
+              <th>Earned</th>
+              <th>Paid</th>
+              <th>Pending</th>
+            </tr>
+          </thead>
+
+          <tbody id="inactivePendingTable">
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- Enumerators -->
+  <section
+    id="enumerators"
+    class="page">
+
+    <div class="panel">
+      <h2>
+        Bulk Add Enumerators from Excel
+      </h2>
+
+      <p class="help-text">
+        Required columns:
+        Enumerator ID, Name, Mobile No, Booth No,
+        Booth Name, Bank Account No and IFSC Code.
+      </p>
+
+      <input
+        type="file"
+        id="enumeratorExcelFile"
+        accept=".xlsx,.xls,.csv">
+
+      <br><br>
+
+      <button
+        class="btn btn-green"
+        onclick="importEnumeratorsFromExcel()">
+        Upload Enumerator Excel
+      </button>
+
+      <button
+        class="btn btn-orange"
+        onclick="downloadEnumeratorTemplate()">
+        Download Enumerator Template
+      </button>
+
+      <div id="importResult"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Add Enumerator Manually</h2>
+
+      <div class="form-grid">
+
+        <div>
+          <label for="enumId">
+            Enumerator ID
+          </label>
+
+          <input
+            id="enumId"
+            type="text">
+        </div>
+
+        <div>
+          <label for="enumName">
+            Name
+          </label>
+
+          <input
+            id="enumName"
+            type="text">
+        </div>
+
+        <div>
+          <label for="enumMobile">
+            Mobile No
+          </label>
+
+          <input
+            id="enumMobile"
+            type="text">
+        </div>
+
+        <div>
+          <label for="enumBoothNo">
+            Booth No
+          </label>
+
+          <input
+            id="enumBoothNo"
+            type="text">
+        </div>
+
+        <div>
+          <label for="enumBoothName">
+            Booth Name
+          </label>
+
+          <input
+            id="enumBoothName"
+            type="text">
+        </div>
+
+        <div>
+          <label for="enumBankAccount">
+            Bank Account No
+          </label>
+
+          <input
+            id="enumBankAccount"
+            type="text">
+        </div>
+
+        <div>
+          <label for="enumIfsc">
+            IFSC Code
+          </label>
+
+          <input
+            id="enumIfsc"
+            type="text">
+        </div>
+
+        <div>
+          <label for="enumStatus">
+            Status
+          </label>
+
+          <select id="enumStatus">
+            <option value="Active">
+              Active
+            </option>
+
+            <option value="Inactive">
+              Inactive
+            </option>
+          </select>
+        </div>
+
+      </div>
+
+      <br>
+
+      <button
+        class="btn btn-green"
+        onclick="addEnumerator()">
+        Add Enumerator
+      </button>
+    </div>
+
+    <div class="panel">
+      <h2>Enumerator List</h2>
+
+      <div class="filter-bar">
+
+        <input
+          id="searchEnumerator"
+          type="text"
+          placeholder="Search ID, name or mobile"
+          onkeyup="renderEnumerators()">
+
+        <input
+          id="searchBoothNo"
+          type="text"
+          placeholder="Search Booth No"
+          onkeyup="renderEnumerators()">
+
+        <select
+          id="boothFilter"
+          onchange="renderEnumerators()">
+          <option value="">
+            All Booths
+          </option>
+        </select>
+
+        <select
+          id="statusFilter"
+          onchange="renderEnumerators()">
+
+          <option value="All">
+            All Status
+          </option>
+
+          <option value="Active">
+            Active
+          </option>
+
+          <option value="Inactive">
+            Inactive
+          </option>
+
+          <option value="Pending">
+            Pending Payment
+          </option>
+
+          <option value="Paid">
+            Fully Paid
+          </option>
+
+        </select>
+
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Mobile</th>
+              <th>Booth No</th>
+              <th>Booth Name</th>
+              <th>Bank Account No</th>
+              <th>IFSC Code</th>
+              <th>Status</th>
+              <th>Surveys</th>
+              <th>Rate</th>
+              <th>Earned</th>
+              <th>Paid to Enumerator</th>
+              <th>Balance</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody id="enumeratorTableBody">
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+   
+
+  </section>
+
+  <!-- Surveys -->
+  <section
+    id="surveys"
+    class="page">
+
+    <div class="panel">
+      <h2>
+        Bulk Upload Survey Data from Excel
+      </h2>
+
+      <p class="help-text">
+        Required columns:
+        Date, Name, Mobile No, Booth Name and
+        No. of Survey.
+      </p>
+
+      <input
+        type="file"
+        id="surveyExcelFile"
+        accept=".xlsx,.xls,.csv">
+
+      <br><br>
+
+      <button
+        class="btn btn-green"
+        onclick="importSurveysFromExcel()">
+        Upload Survey Excel
+      </button>
+
+      <button
+        class="btn btn-orange"
+        onclick="downloadSurveyTemplate()">
+        Download Survey Template
+      </button>
+
+      <div id="surveyImportResult"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Add Survey Manually</h2>
+
+      <div class="form-grid">
+
+        <div>
+          <label for="surveyDate">
+            Date
+          </label>
+
+          <input
+            id="surveyDate"
+            type="date">
+        </div>
+
+        <div>
+          <label for="surveyEnumerator">
+            Enumerator
+          </label>
+
+          <select id="surveyEnumerator">
+            <option value="">
+              Select Enumerator
+            </option>
+          </select>
+        </div>
+
+        <div>
+          <label for="surveyCount">
+            Number of Surveys
+          </label>
+
+          <input
+            id="surveyCount"
+            type="number"
+            min="1">
+        </div>
+
+        <div>
+          <label for="surveyRate">
+            Rate
+          </label>
+
+          <input
+            id="surveyRate"
+            type="number"
+            value="250"
+            readonly>
+        </div>
+
+        <div>
+          <label for="surveyRemarks">
+            Remarks
+          </label>
+
+          <input
+            id="surveyRemarks"
+            type="text">
+        </div>
+
+      </div>
+
+      <br>
+
+      <button
+        class="btn btn-green"
+        onclick="addSurvey()">
+        Add Survey
+      </button>
+    </div>
+
+    <div class="panel">
+      <h2>Survey History</h2>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Enumerator</th>
+              <th>Name</th>
+              <th>Mobile</th>
+              <th>Booth Name</th>
+              <th>Surveys</th>
+              <th>Rate</th>
+              <th>Total Amount</th>
+              <th>Remarks</th>
+            </tr>
+          </thead>
+
+          <tbody id="surveyHistoryBody">
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- Fund Received from DDPO -->
+<section
+  id="ddpoFunds"
+  class="page">
+
+  <div class="panel">
+    <h2>
+      Fund Received from DDPO
+    </h2>
+
+    <p class="help-text">
+      Upload the DDPO list containing the amount
+      released for each enumerator.
+    </p>
+
+    <div class="detail-box">
+      <strong>
+        Required Excel column order
+      </strong>
+
+      <div class="required-columns">
+        1. Date<br>
+        2. Name<br>
+        3. Mobile No<br>
+        4. Booth Name<br>
+        5. Fund Released Amount
+      </div>
+    </div>
+
+    <input
+      id="ddpoAllocationExcelFile"
+      type="file"
+      accept=".xlsx,.xls,.csv">
+
+    <br><br>
+
+    <button
+      class="btn btn-green"
+      onclick="importDDPOAllocations()">
+      Upload DDPO List
+    </button>
+
+    <div
+      id="ddpoAllocationImportResult">
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>
+      DDPO Fund Release List
+    </h2>
+
+    <div class="table-container">
+      <table>
+        <thead
+          id="ddpoAllocationTableHead">
+        </thead>
+
+        <tbody
+          id="ddpoAllocationTableBody">
+        </tbody>
+
+        <tfoot
+          id="ddpoAllocationTableFooter">
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+</section>
+  <!-- Payments -->
+  <section
+    id="payments"
+    class="page">
+
+    <div class="panel">
+      <h2>
+        Bulk Upload Installment Payment Excel
+      </h2>
+
+      <p class="help-text">
+        Excel column position is important.
+        The first four columns are fixed.
+        The fifth column is the installment amount.
+      </p>
+
+      <div class="detail-box">
+
+        <strong>
+          Excel column order
+        </strong>
+
+        <div class="required-columns">
+          1. Date<br>
+          2. Name<br>
+          3. Mobile No<br>
+          4. Booth Name<br>
+          5. Installment Amount
+        </div>
+
+        <p class="help-text">
+          The heading of column 5 becomes the
+          installment name. Example:
+          1st Installment, 2nd Installment,
+          3rd Installment.
+        </p>
+
+      </div>
+
+      <div class="form-grid">
+
+        <div>
+          <label for="paymentExcelFile">
+            Payment Excel File
+          </label>
+
+          <input
+            id="paymentExcelFile"
+            type="file"
+            accept=".xlsx,.xls,.csv">
+        </div>
+
+        <div>
+          <label for="installmentName">
+            Installment Name Override
+          </label>
+
+          <input
+            id="installmentName"
+            type="text"
+            placeholder="Optional">
+        </div>
+
+      </div>
+
+      <br>
+
+      <button
+        class="btn btn-green"
+        onclick="importInstallmentFromExcel()">
+        Upload Installment Excel
+      </button>
+
+      <button
+        class="btn btn-orange"
+        onclick="downloadPaymentTemplate()">
+        Download Payment Template
+      </button>
+
+      <div id="paymentImportResult"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Uploaded Installments</h2>
+
+      <p class="help-text">
+        Select an installment and delete it if the
+        wrong file was uploaded.
+      </p>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr id="installmentHeaderRow">
+            </tr>
+          </thead>
+
+          <tbody id="installmentTableBody">
+          </tbody>
+
+          <tfoot id="installmentFooter">
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Add Payment Manually</h2>
+
+      <div class="form-grid">
+
+        <div>
+          <label for="paymentDate">
+            Payment Date
+          </label>
+
+          <input
+            id="paymentDate"
+            type="date">
+        </div>
+
+        <div>
+          <label for="paymentEnumerator">
+            Enumerator
+          </label>
+
+          <select id="paymentEnumerator">
+            <option value="">
+              Select Enumerator
+            </option>
+          </select>
+        </div>
+
+        <div>
+          <label for="paymentAmount">
+            Amount Paid
+          </label>
+
+          <input
+            id="paymentAmount"
+            type="number"
+            min="1">
+        </div>
+
+        <div>
+          <label for="paymentReference">
+            Reference/Voucher No.
+          </label>
+
+          <input
+            id="paymentReference"
+            type="text">
+        </div>
+
+        <div>
+          <label for="paymentRemarks">
+            Remarks
+          </label>
+
+          <input
+            id="paymentRemarks"
+            type="text">
+        </div>
+
+      </div>
+
+      <br>
+
+      <button
+        class="btn btn-green"
+        onclick="addPayment()">
+        Record Manual Payment
+      </button>
+    </div>
+
+    <div class="panel">
+      <h2>Manual Payment History</h2>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Enumerator</th>
+              <th>Amount</th>
+              <th>Reference</th>
+              <th>Remarks</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody id="paymentHistoryBody">
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- Reports -->
+<section
+  id="reports"
+  class="page">
+
+  <div class="panel">
+    <h2>Enumerator Balance Report</h2>
+
+    <div class="filter-bar">
+
+      <select
+        id="reportFilter"
+        onchange="handleReportFilterChange()">
+
+        <option value="All">
+          All Enumerators
+        </option>
+
+        <option value="Active">
+          Active Enumerators
+        </option>
+
+        <option value="Inactive">
+          Inactive Enumerators
+        </option>
+
+        <option value="Pending">
+          Pending Payment
+        </option>
+
+        <option value="InactivePending">
+          Inactive With Pending Payment
+        </option>
+
+        <option value="DDPO">
+          DDPO Fund Release Report
+        </option>
+
+      </select>
+
+      <select
+        id="ddpoDateFilter"
+        style="display: none;"
+        onchange="renderReports()">
+
+        <option value="All">
+          All Dates
+        </option>
+
+      </select>
+
+      <button
+        class="btn btn-orange"
+        onclick="exportCSV()">
+
+        Export Report Excel
+      </button>
+
+    </div>
+
+    <div class="table-container">
+      <table>
+
+        <thead id="reportTableHead">
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Total Surveys</th>
+            <th>Rate</th>
+            <th>Total Earned</th>
+            <th>Fund Released</th>
+            <th>Total Paid</th>
+            <th>Pending from Earned</th>
+            <th>Pending from Fund Released</th>
+          </tr>
+        </thead>
+
+        <tbody id="reportTableBody">
+        </tbody>
+
+        <tfoot id="reportFooter">
+        </tfoot>
+
+      </table>
+    </div>
+  </div>
+
+</section>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<script
+  type="module"
+  src="app.js">
+</script>
+
+</body>
+</html>
