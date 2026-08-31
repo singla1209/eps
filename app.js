@@ -15,13 +15,13 @@ import {
 
 /* Firebase configuration */
 const firebaseConfig = {
-  apiKey: "AIzaSyB5pj6BMnM3mmCir_-Edc17aWHfaI4knxo",
-  authDomain: "phonebox-scanner.firebaseapp.com",
-  projectId: "phonebox-scanner",
-  storageBucket: "phonebox-scanner.firebasestorage.app",
-  messagingSenderId: "521766120533",
-  appId: "1:521766120533:web:3e473f63fec832251478dc",
-  measurementId: "G-RSE0YQ6X4E"
+ apiKey: "AIzaSyBKH3gOWk_rG3_IxZuhj3SUGvN5DU_dZ9E",
+  authDomain: "epaymentsystem.firebaseapp.com",
+  projectId: "epaymentsystem",
+  storageBucket: "epaymentsystem.firebasestorage.app",
+  messagingSenderId: "627228868868",
+  appId: "1:627228868868:web:83c5cddab040fdee981051",
+  measurementId: "G-S9D37602ZR"
 };
 
 
