@@ -1579,9 +1579,22 @@ async function importSurveysFromExcel() {
 
     const errors = [];
 
+    /*
+     * This prevents duplicate rows in the
+     * same Excel file from creating problems.
+     *
+     * If the same Date + Enumerator + Mobile
+     * + Booth appears more than once, the
+     * last Excel row replaces the previous row.
+     */
+    const importedSurveys =
+      new Map();
+
     for (
-      const [index, row]
-      of rows.entries()
+      const [
+        index,
+        row
+      ] of rows.entries()
     ) {
       const excelRow =
         index + 2;
@@ -1629,7 +1642,17 @@ async function importSurveysFromExcel() {
         );
 
       const surveyValue =
-        getSurveyCountValue(row);
+        getExcelValue(
+          row,
+          [
+            "No Of Survey",
+            "No. Of Survey",
+            "Number Of Survey",
+            "Survey Count",
+            "Surveys",
+            "Count"
+          ]
+        );
 
       const remarks =
         getExcelValue(
@@ -1642,7 +1665,7 @@ async function importSurveysFromExcel() {
         );
 
       const surveyCount =
-        parseSurveyNumber(
+        parseNumber(
           surveyValue
         );
 
@@ -1665,7 +1688,7 @@ async function importSurveysFromExcel() {
         !Number.isFinite(
           surveyCount
         ) ||
-        surveyCount <= 0
+        surveyCount < 0
       ) {
         skipped++;
 
@@ -1676,69 +1699,161 @@ async function importSurveysFromExcel() {
         continue;
       }
 
-      const enumerator =
-        findEnumerator(
-          name,
-          mobile,
+      /*
+       * The survey Excel has no Enumerator ID.
+       * Find the enumerator from existing data.
+       */
+      const normalizedName =
+        normalizeMatchValue(
+          name
+        );
+
+      const normalizedMobile =
+        normalizeMatchValue(
+          mobile
+        );
+
+      const normalizedBooth =
+        normalizeMatchValue(
           boothName
+        );
+
+      const enumerator =
+        enumerators.find(
+          (item) =>
+            normalizeMatchValue(
+              item.name
+            ) === normalizedName &&
+            normalizeMatchValue(
+              item.mobile
+            ) === normalizedMobile &&
+            normalizeMatchValue(
+              item.boothName
+            ) === normalizedBooth
         );
 
       if (!enumerator) {
         skipped++;
 
         errors.push(
-          `Row ${excelRow}: Matching enumerator not found.`
+          `Row ${excelRow}: Enumerator not found for Name: ${name}, Mobile: ${mobile}, Booth: ${boothName}.`
         );
 
         continue;
       }
 
-      const surveyItem = {
-        id:
-          makeSurveyImportId(
-            date,
-            enumerator.id,
-            boothName,
-            surveyCount
-          ),
-        date,
-        enumeratorId:
+      /*
+       * Survey count is deliberately NOT included.
+       *
+       * Final ID:
+       * Date_EnumeratorID_MobileNo_BoothName
+       */
+      const surveyId =
+        [
+          date,
           enumerator.id,
-        name:
-          enumerator.name ||
-          name,
-        mobile:
-          enumerator.mobile ||
           mobile,
-        boothName:
-          enumerator.boothName ||
-          boothName,
-        count:
-          surveyCount,
-        rate:
-          SURVEY_RATE,
-        totalAmount:
-          surveyCount *
-          SURVEY_RATE,
-        remarks,
-        source: "excel"
-      };
+          boothName
+        ]
+          .map(clean)
+          .join("_")
+          .replace(
+            /[^a-zA-Z0-9_-]/g,
+            ""
+          );
 
+      /*
+       * Last matching row in the Excel file
+       * add the survey count of an earlier matching row.
+       */
+				const previousSurvey =
+				importedSurveys.get(
+    surveyId
+  );
+
+if (previousSurvey) {
+  /*
+   * Same Date + Enumerator +
+   * Mobile + Booth found again
+   * in this Excel file.
+   *
+   * Merge the survey counts.
+   */
+  previousSurvey.count +=
+    surveyCount;
+
+  previousSurvey.totalAmount =
+    previousSurvey.count *
+    SURVEY_RATE;
+
+  previousSurvey.remarks =
+    [
+      previousSurvey.remarks,
+      remarks
+    ]
+      .filter(Boolean)
+      .join(" | ");
+
+  importedSurveys.set(
+    surveyId,
+    previousSurvey
+  );
+} else {
+  importedSurveys.set(
+    surveyId,
+    {
+      id: surveyId,
+      date,
+      enumeratorId:
+        enumerator.id,
+      name:
+        enumerator.name ||
+        name,
+      mobile:
+        enumerator.mobile ||
+        mobile,
+      boothName:
+        enumerator.boothName ||
+        boothName,
+      count: surveyCount,
+      rate: SURVEY_RATE,
+      totalAmount:
+        surveyCount *
+        SURVEY_RATE,
+      remarks,
+      source: "excel",
+      excelRow
+    }
+  );
+}
+    }
+
+    /*
+     * Save one final row per survey ID.
+     */
+    for (
+      const surveyItem of
+        importedSurveys.values()
+    ) {
       try {
-        const oldIndex =
+        const existingIndex =
           surveys.findIndex(
             (item) =>
               clean(item.id) ===
               clean(surveyItem.id)
           );
 
+        /*
+         * This replaces the complete old
+         * survey data. It does not add counts.
+         */
         await saveToFirebase(
           COLLECTIONS.surveys,
           surveyItem
         );
 
-        if (oldIndex >= 0) {
-          surveys[oldIndex] =
+        if (existingIndex >= 0) {
+          surveys[existingIndex] =
             surveyItem;
 
           updated++;
@@ -1753,7 +1868,7 @@ async function importSurveysFromExcel() {
         failed++;
 
         errors.push(
-          `Row ${excelRow}: Firebase save failed.`
+          `Excel row ${surveyItem.excelRow}: Firebase save failed.`
         );
       }
     }
@@ -1764,7 +1879,7 @@ async function importSurveysFromExcel() {
       <div class="import-success">
         Survey import completed.<br>
         Added: ${added}<br>
-        Updated: ${updated}<br>
+        Replaced/Updated: ${updated}<br>
         Skipped: ${skipped}<br>
         Failed: ${failed}
       </div>
@@ -1774,7 +1889,7 @@ async function importSurveysFromExcel() {
           ? `
             <div class="import-warning">
               ${errors
-                .slice(0, 10)
+                .slice(0, 20)
                 .map(
                   (error) =>
                     escapeHtml(error)
@@ -1795,12 +1910,11 @@ async function importSurveysFromExcel() {
 
     resultBox.innerHTML = `
       <div class="import-warning">
-        Could not read Survey Excel file.
+        Could not read the Survey Excel file.
       </div>
     `;
   }
 }
-
 
 /* Survey template */
 function downloadSurveyTemplate() {
