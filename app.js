@@ -3488,65 +3488,7 @@ const inactivePendingAmount =
 
 /*start last card of dashboard */
 
-	const inactivePendingDDPOAmount =
-  data
-    .filter(
-      (item) =>
-        item.status ===
-        "Inactive"
-    )
-    .reduce(
-      (sum, item) => {
-        const ddpoReleased =
-          ddpoAllocations
-            .filter(
-              (allocation) =>
-                allocation.enumeratorId ===
-                item.id
-            )
-            .reduce(
-              (total, allocation) =>
-                total +
-                Number(
-                  allocation.amount || 0
-                ),
-              0
-            );
-
-        const ddpoPaid =
-          payments
-            .filter(
-              (payment) =>
-                payment.enumeratorId ===
-                item.id &&
-                payment.source ===
-                "DDPO"
-            )
-            .reduce(
-              (total, payment) =>
-                total +
-                Number(
-                  payment.amount || 0
-                ),
-              0
-            );
-
-        return sum +
-          Math.max(
-            ddpoReleased -
-              ddpoPaid,
-            0
-          );
-      },
-      0
-    );
-
-document.getElementById(
-  "inactivePendingDDPOAmount"
-).innerText =
-  `₹${money(
-    inactivePendingDDPOAmount
-  )}`;
+	
 	
 /*end of last card of Dashboard code */
 
