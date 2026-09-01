@@ -3493,54 +3493,42 @@ const inactivePendingDDPOAmount =
   data
     .filter(
       (item) =>
-        String(item.status)
-          .trim()
-          .toLowerCase() ===
-          "inactive" &&
-        Number(
-          item.pendingFromFundReleased || 0
-        ) > 0
+        item.status ===
+          "Inactive" &&
+        item.balance > 0
     )
     .reduce(
       (sum, item) =>
-        sum +
-        Number(
-          item.pendingFromFundReleased || 0
-        ),
+        sum + item.balance,
       0
     );
+  
+  document.getElementById(
+    "totalEnumerators"
+  ).innerText =
+    enumerators.length;
 
-document.getElementById(
-  "totalEnumerators"
-).innerText =
-  enumerators.length;
+  document.getElementById(
+    "totalSurveys"
+  ).innerText =
+    totalSurveys;
 
-document.getElementById(
-  "totalSurveys"
-).innerText =
-  totalSurveys;
+  document.getElementById(
+    "totalEarned"
+  ).innerText =
+    `₹${money(totalEarned)}`;
 
-document.getElementById(
-  "totalEarned"
-).innerText =
-  `₹${money(totalEarned)}`;
+  document.getElementById(
+    "totalPaid"
+  ).innerText =
+    `₹${money(totalPaid)}`;
 
-document.getElementById(
-  "totalPaid"
-).innerText =
-  `₹${money(totalPaid)}`;
-
-document.getElementById(
-  "totalPending"
-).innerText =
-  `₹${money(totalPending)}`;
-
-document.getElementById(
-  "inactivePendingAmount"
-).innerText =
-  `₹${money(inactivePendingAmount)}`;
-
-document.getElementById(
+  document.getElementById(
+    "totalPending"
+  ).innerText =
+    `₹${money(totalPending)}`;
+  
+  document.getElementById(
   "inactivePendingDDPOAmount"
 ).innerText =
   `₹${money(inactivePendingDDPOAmount)}`;
