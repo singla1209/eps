@@ -3405,35 +3405,57 @@ function renderSurveyHistory() {
 
 
 /* Dashboard */
-const inactivePendingDDPOAmount =
-    data
-      .filter(
-        (item) =>
-          item.status ===
-            "Inactive" &&
-          Number(
-            item.fundReleased || 0
-          ) -
-            Number(
-              item.totalPaid || 0
-            ) >
-            0
-      )
-      .reduce(
-        (sum, item) =>
-          sum +
-          Math.max(
-            Number(
-              item.fundReleased || 0
-            ) -
-              Number(
-                item.totalPaid || 0
-              ),
-            0
-          ),
-        0
-      );
+function renderDashboard() {
+  const data =
+    enumerators.map(
+      (item) =>
+        getEnumeratorData(
+          item.id
+        )
+    );
 
+  const totalSurveys =
+    data.reduce(
+      (sum, item) =>
+        sum + item.totalSurveys,
+      0
+    );
+
+  const totalEarned =
+    data.reduce(
+      (sum, item) =>
+        sum + item.earned,
+      0
+    );
+
+  const totalPaid =
+    data.reduce(
+      (sum, item) =>
+        sum + item.totalPaid,
+      0
+    );
+
+ const totalPending =
+  data.reduce(
+    (sum, item) =>
+      sum + Number(item.balance || 0),
+    0
+  );
+
+const inactivePendingAmount =
+  data
+    .filter(
+      (item) =>
+        item.status ===
+          "Inactive" &&
+        item.balance > 0
+    )
+    .reduce(
+      (sum, item) =>
+        sum + item.balance,
+      0
+    );
+  
   document.getElementById(
     "totalEnumerators"
   ).innerText =
@@ -3458,23 +3480,73 @@ const inactivePendingDDPOAmount =
     "totalPending"
   ).innerText =
     `₹${money(totalPending)}`;
-
+  
   document.getElementById(
-    "inactivePendingAmount"
-  ).innerText =
-    `₹${money(
-      inactivePendingAmount
-    )}`;
+  "inactivePendingAmount"
+).innerText =
+  `₹${money(inactivePendingAmount)}`;
 
-  document.getElementById(
-    "inactivePendingDDPOAmount"
-  ).innerText =
-    `₹${money(
-      inactivePendingDDPOAmount
-    )}`;
-}
+/*start last card of dashboard */
 
+	const inactivePendingDDPOAmount =
+  data
+    .filter(
+      (item) =>
+        item.status ===
+        "Inactive"
+    )
+    .reduce(
+      (sum, item) => {
+        const ddpoReleased =
+          ddpoAllocations
+            .filter(
+              (allocation) =>
+                allocation.enumeratorId ===
+                item.id
+            )
+            .reduce(
+              (total, allocation) =>
+                total +
+                Number(
+                  allocation.amount || 0
+                ),
+              0
+            );
 
+        const ddpoPaid =
+          payments
+            .filter(
+              (payment) =>
+                payment.enumeratorId ===
+                item.id &&
+                payment.source ===
+                "DDPO"
+            )
+            .reduce(
+              (total, payment) =>
+                total +
+                Number(
+                  payment.amount || 0
+                ),
+              0
+            );
+
+        return sum +
+          Math.max(
+            ddpoReleased -
+              ddpoPaid,
+            0
+          );
+      },
+      0
+    );
+
+document.getElementById(
+  "inactivePendingDDPOAmount"
+).innerText =
+  `₹${money(
+    inactivePendingDDPOAmount
+  )}`;
 	
 /*end of last card of Dashboard code */
 
