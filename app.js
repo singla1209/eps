@@ -3489,13 +3489,17 @@ const inactivePendingAmount =
 
 /* This is last Card of Dashbord Code */
 
-
 const inactivePendingDDPOAmount =
   data
     .filter(
       (item) =>
-        item.status === "Inactive" &&
-        item.pendingFromFundReleased > 0
+        String(item.status)
+          .trim()
+          .toLowerCase() ===
+          "inactive" &&
+        Number(
+          item.pendingFromFundReleased || 0
+        ) > 0
     )
     .reduce(
       (sum, item) =>
