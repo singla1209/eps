@@ -3489,18 +3489,6 @@ const inactivePendingAmount =
 
 /* This is last Card of Dashbord Code */
 
-const inactivePendingAmount =
-  data
-    .filter(
-      (item) =>
-        item.status === "Inactive" &&
-        item.balance > 0
-    )
-    .reduce(
-      (sum, item) =>
-        sum + item.balance,
-      0
-    );
 
 const inactivePendingDDPOAmount =
   data
