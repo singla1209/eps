@@ -3486,6 +3486,76 @@ const inactivePendingAmount =
 ).innerText =
   `₹${money(inactivePendingAmount)}`;
 
+
+/* This is last Card of Dashbord Code */
+
+const inactivePendingAmount =
+  data
+    .filter(
+      (item) =>
+        item.status === "Inactive" &&
+        item.balance > 0
+    )
+    .reduce(
+      (sum, item) =>
+        sum + item.balance,
+      0
+    );
+
+const inactivePendingDDPOAmount =
+  data
+    .filter(
+      (item) =>
+        item.status === "Inactive" &&
+        item.pendingFromFundReleased > 0
+    )
+    .reduce(
+      (sum, item) =>
+        sum +
+        Number(
+          item.pendingFromFundReleased || 0
+        ),
+      0
+    );
+
+document.getElementById(
+  "totalEnumerators"
+).innerText =
+  enumerators.length;
+
+document.getElementById(
+  "totalSurveys"
+).innerText =
+  totalSurveys;
+
+document.getElementById(
+  "totalEarned"
+).innerText =
+  `₹${money(totalEarned)}`;
+
+document.getElementById(
+  "totalPaid"
+).innerText =
+  `₹${money(totalPaid)}`;
+
+document.getElementById(
+  "totalPending"
+).innerText =
+  `₹${money(totalPending)}`;
+
+document.getElementById(
+  "inactivePendingAmount"
+).innerText =
+  `₹${money(inactivePendingAmount)}`;
+
+document.getElementById(
+  "inactivePendingDDPOAmount"
+).innerText =
+  `₹${money(inactivePendingDDPOAmount)}`;
+
+	
+/*end of last card of Dashboard code */
+
   const table =
     document.getElementById(
       "inactivePendingTable"
