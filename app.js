@@ -4069,6 +4069,8 @@ function exportEnumeratorReport() {
       "Enumerator ID",
       "Name",
       "Mobile",
+      "Bank Account No",
+      "IFSC Code",
       "Booth No",
       "Booth Name",
       "Status",
@@ -4087,6 +4089,8 @@ function exportEnumeratorReport() {
       item.id || "",
       item.name || "",
       item.mobile || "",
+      item.bankAccountNo || "",
+      item.ifscCode || "",
       item.boothNo || "",
       item.boothName || "",
       item.status || "",
@@ -4117,7 +4121,6 @@ function exportEnumeratorReport() {
     "enumerator-ddpo-report.xlsx"
   );
 }
-
 function exportCSV() {
   const filter =
     document.getElementById(
