@@ -3405,104 +3405,35 @@ function renderSurveyHistory() {
 
 
 /* Dashboard */
-function renderDashboard() {
-  const data =
-    enumerators.map(
-      (item) =>
-        getEnumeratorData(
-          item.id
-        )
-    );
-
-  const totalSurveys =
-    data.reduce(
-      (sum, item) =>
-        sum + item.totalSurveys,
-      0
-    );
-
-  const totalEarned =
-    data.reduce(
-      (sum, item) =>
-        sum + item.earned,
-      0
-    );
-
-  const totalPaid =
-    data.reduce(
-      (sum, item) =>
-        sum + item.totalPaid,
-      0
-    );
-
- const totalPending =
-  data.reduce(
-    (sum, item) =>
-      sum + Number(item.balance || 0),
-    0
-  );
-
-const inactivePendingAmount =
-  data
-    .filter(
-      (item) =>
-        item.status ===
-          "Inactive" &&
-        item.balance > 0
-    )
-    .reduce(
-      (sum, item) =>
-        sum + item.balance,
-      0
-    );
-  
-  document.getElementById(
-    "totalEnumerators"
-  ).innerText =
-    enumerators.length;
-
-  document.getElementById(
-    "totalSurveys"
-  ).innerText =
-    totalSurveys;
-
-  document.getElementById(
-    "totalEarned"
-  ).innerText =
-    `₹${money(totalEarned)}`;
-
-  document.getElementById(
-    "totalPaid"
-  ).innerText =
-    `₹${money(totalPaid)}`;
-
-  document.getElementById(
-    "totalPending"
-  ).innerText =
-    `₹${money(totalPending)}`;
-  
-  document.getElementById(
-  "inactivePendingAmount"
-).innerText =
-  `₹${money(inactivePendingAmount)}`;
-
-
-/* This is last Card of Dashbord Code */
-
 const inactivePendingDDPOAmount =
-  data
-    .filter(
-      (item) =>
-        item.status ===
-          "Inactive" &&
-        item.balance > 0
-    )
-    .reduce(
-      (sum, item) =>
-        sum + item.balance,
-      0
-    );
-  
+    data
+      .filter(
+        (item) =>
+          item.status ===
+            "Inactive" &&
+          Number(
+            item.fundReleased || 0
+          ) -
+            Number(
+              item.totalPaid || 0
+            ) >
+            0
+      )
+      .reduce(
+        (sum, item) =>
+          sum +
+          Math.max(
+            Number(
+              item.fundReleased || 0
+            ) -
+              Number(
+                item.totalPaid || 0
+              ),
+            0
+          ),
+        0
+      );
+
   document.getElementById(
     "totalEnumerators"
   ).innerText =
@@ -3527,11 +3458,22 @@ const inactivePendingDDPOAmount =
     "totalPending"
   ).innerText =
     `₹${money(totalPending)}`;
-  
+
   document.getElementById(
-  "inactivePendingDDPOAmount"
-).innerText =
-  `₹${money(inactivePendingDDPOAmount)}`;
+    "inactivePendingAmount"
+  ).innerText =
+    `₹${money(
+      inactivePendingAmount
+    )}`;
+
+  document.getElementById(
+    "inactivePendingDDPOAmount"
+  ).innerText =
+    `₹${money(
+      inactivePendingDDPOAmount
+    )}`;
+}
+
 
 	
 /*end of last card of Dashboard code */
