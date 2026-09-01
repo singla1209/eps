@@ -4116,10 +4116,32 @@ function exportEnumeratorReport() {
     "Enumerator Report"
   );
 
-  XLSX.writeFile(
-    workbook,
-    "enumerator-ddpo-report.xlsx"
+  const reportFilter =
+  document.getElementById(
+    "reportFilter"
   );
+
+const selectedReportName =
+  reportFilter?.options[
+    reportFilter.selectedIndex
+  ]?.text || "Enumerator Report";
+
+const safeFileName =
+  selectedReportName
+    .trim()
+    .replace(
+      /[\\/:*?"<>|]/g,
+      ""
+    )
+    .replace(
+      /\s+/g,
+      "-"
+    );
+
+XLSX.writeFile(
+  workbook,
+  `${safeFileName}.xlsx`
+);
 }
 function exportCSV() {
   const filter =
